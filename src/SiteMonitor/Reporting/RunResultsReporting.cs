@@ -14,18 +14,19 @@ namespace SiteMonitor.Reporting
 
         public static void Initialize()
         {
+            var IISExpressLocation = @"C:\Program Files\IIS Express\IISExpress.exe";
             var path = Path.GetFullPath(AppDomain.CurrentDomain.BaseDirectory);
 
-            Console.WriteLine(path);
-
-            _iis = new IISExpress(new Parameters
+            using (_iis = new IISExpress(new Parameters
                     {
                         Port = 8585,
                         Path = path
-                    }
-                );
-
-            Thread.Sleep(1000);
+                    },
+                    IISExpressLocation
+                ))
+            {
+                Thread.Sleep(60000);
+            }
         }
     }
 }

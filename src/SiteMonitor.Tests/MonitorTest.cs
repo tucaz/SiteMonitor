@@ -8,6 +8,7 @@ namespace SiteMonitor.Tests
         public static void Main()
         {
             Monitor.AddRunner(new GoogleSearchRunner());
+
             Monitor.StartMonitoring();
 
             var db = new Database();

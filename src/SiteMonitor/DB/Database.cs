@@ -7,6 +7,7 @@ using System.Data.SQLite;
 using System.Data.Common;
 using Dapper;
 using System.IO;
+using SiteMonitor.Reporting;
 
 namespace SiteMonitor.DB
 {
@@ -14,10 +15,29 @@ namespace SiteMonitor.DB
     {
         private static bool _databaseCreated = false;
 
-        public void GetRunResults(string runnerName, DateTime from, DateTime to)
+        public List<string> GetAllRunners()
         {
             using (var conn = CreateConnection())
-            {                
+            {
+                var sql = @"SELECT 
+                                    DISTINCT TestName
+                                 FROM
+                                    RunResults";
+
+                var runners = conn.Query<string>(sql);
+
+                return runners.ToList();
+            }
+        }
+
+        public RunResultsForRunner GetRunResults(string runnerName, DateTime? from, DateTime? to)
+        {
+            if (String.IsNullOrWhiteSpace(runnerName)) throw new ArgumentNullException("runnerName");
+            if (!from.HasValue) from = DateTime.Now.AddDays(-1);
+            if (!to.HasValue) to = DateTime.Now;
+
+            using (var conn = CreateConnection())
+            {
                 var sqlScale = @"SELECT 
                                     MIN(TimeTaken) as Lower,
                                     MAX(TimeTaken) as Upper
@@ -40,10 +60,19 @@ namespace SiteMonitor.DB
                                         RanAt BETWEEN @From AND @To";
 
                 var scale = conn.Query(sqlScale, new { RunnerName = runnerName, From = from, To = to }).First();
-                var results = conn.Query<RunResults>(sqlRunResults, new { RunnerName = runnerName, From = from, To = to });
+                var runResults = conn.Query<RunResults>(sqlRunResults, new { RunnerName = runnerName, From = from, To = to });
+
+                var results = new RunResultsForRunner()
+                {
+                    LowerScale = scale.Lower,
+                    UpperScale = scale.Upper,
+                    Entries = runResults.Select(x => new Entry() { RanAt = x.RanAt, TimeTaken = new TimeSpan(x.TicksTaken).TotalSeconds }).ToList()
+                };
+
+                return results;
             }
         }
-        
+
         public void SaveRunResults(RunResults results)
         {
             using (var conn = CreateConnection())

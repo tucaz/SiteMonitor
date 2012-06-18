@@ -71,6 +71,7 @@
     <Compile Include="DB\Database.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Reporting\RunResultsForRunner.cs" />
     <Compile Include="Reporting\RunResultsReporting.cs" />
     <Compile Include="Runner\BaseRunner.cs" />
     <Compile Include="Runner\RunResults.cs" />
@@ -78,11 +79,6 @@
   <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Reporting\assets\js\HelloWorld.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

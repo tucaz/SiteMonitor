@@ -21,9 +21,10 @@ namespace SiteMonitor.Runner
             get
             {
                 var dt = new DateTime(this.TicksTaken);
-                var timeTaken = (dt.Minute + (1m / dt.Second)).ToString("N2");
+                
+                //var timeTaken = (dt.Minute + (1m / dt.Second)).ToString("N2");
 
-                return timeTaken;
+                return dt.ToString();
             }
         }
     }

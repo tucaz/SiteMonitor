@@ -34,7 +34,7 @@ namespace SiteMonitor
                 var result = new RunResults(runner.RunnerName);
                 runner.Run();
 
-                result.TicksTaken = runner.TimeTaken.Value.Ticks;
+                result.TicksTaken = runner.TimeTaken.Ticks;
                 results.Add(result);
             }
 

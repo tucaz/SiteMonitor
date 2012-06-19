@@ -1,18 +1,16 @@
-﻿
-using SiteMonitor.DB;
-using System;
+﻿using SiteMonitor.Tests.SampleRunners;
+
 namespace SiteMonitor.Tests
 {
     public static class MonitorTest
     {
         public static void Main()
         {
-            Monitor.AddRunner(new GoogleSearchRunner());
-
-            Monitor.StartMonitoring();
-
-            var db = new Database();
-            db.GetRunResults("GoogleSearchRunner", DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+            Monitor.AddRunner(new RandomTimeRunner());
+            for (int i = 0; i < 100; i++)
+            {
+                Monitor.StartMonitoring();
+            }            
         }
     }
 }

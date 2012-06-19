@@ -10,7 +10,7 @@ using System.IO;
 using SiteMonitor.Reporting;
 
 namespace SiteMonitor.DB
-{
+{    
     public class Database
     {
         private static bool _databaseCreated = false;
@@ -22,33 +22,23 @@ namespace SiteMonitor.DB
                 var sql = @"SELECT 
                                     DISTINCT TestName
                                  FROM
-                                    RunResults";
+                                    RunResults
+                                 ORDER BY
+                                    TestName ASC";
 
                 var runners = conn.Query<string>(sql);
 
                 return runners.ToList();
             }
-        }
+        }      
 
-        public RunResultsForRunner GetRunResults(string runnerName, DateTime? from, DateTime? to)
+        public RunResultsForRunner GetRunResults(string runnerName, DateTime from, DateTime to)
         {
             if (String.IsNullOrWhiteSpace(runnerName)) throw new ArgumentNullException("runnerName");
-            if (!from.HasValue) from = DateTime.Now.AddDays(-1);
-            if (!to.HasValue) to = DateTime.Now;
 
             using (var conn = CreateConnection())
             {
-                var sqlScale = @"SELECT 
-                                    MIN(TimeTaken) as Lower,
-                                    MAX(TimeTaken) as Upper
-                                 FROM
-                                    RunResults
-                                 WHERE
-                                    TestName = @RunnerName
-                                 AND
-                                    RanAt BETWEEN @From AND @To";
-
-                var sqlRunResults = @"SELECT 
+                var sql = @"SELECT 
                                         TestName as RunnerName,
                                         RanAt,
                                         TimeTaken as TicksTaken
@@ -57,15 +47,14 @@ namespace SiteMonitor.DB
                                      WHERE
                                         TestName = @RunnerName
                                      AND
-                                        RanAt BETWEEN @From AND @To";
+                                        RanAt BETWEEN @From AND @To
+                                     ORDER BY
+                                        RanAt ASC";
 
-                var scale = conn.Query(sqlScale, new { RunnerName = runnerName, From = from, To = to }).First();
-                var runResults = conn.Query<RunResults>(sqlRunResults, new { RunnerName = runnerName, From = from, To = to });
+                var runResults = conn.Query<RunResults>(sql, new { RunnerName = runnerName, From = from, To = to });
 
                 var results = new RunResultsForRunner()
                 {
-                    LowerScale = scale.Lower,
-                    UpperScale = scale.Upper,
                     Entries = runResults.Select(x => new Entry() { RanAt = x.RanAt, TimeTaken = new TimeSpan(x.TicksTaken).TotalSeconds }).ToList()
                 };
 
@@ -131,5 +120,5 @@ namespace SiteMonitor.DB
 
             return connection;
         }
-    }
+    }    
 }

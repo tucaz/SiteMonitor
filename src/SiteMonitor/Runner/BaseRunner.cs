@@ -9,9 +9,8 @@ namespace SiteMonitor.Runner
     {
         private IWebDriver _driver;
         private Stopwatch _sw = new Stopwatch();
-
-        public TimeSpan? TimeTaken { get; private set; }
-
+        public TimeSpan TimeTaken { get; private set; }
+        
         public virtual string RunnerName
         {
             get
@@ -25,12 +24,13 @@ namespace SiteMonitor.Runner
             Setup();
 
             try
-            {
+            {                
+                _sw.Reset();
                 _sw.Start();
                 this.Run(_driver);
                 _sw.Stop();
 
-                TimeTaken = _sw.Elapsed;
+                this.TimeTaken = _sw.Elapsed;                
             }
             finally
             {
@@ -40,13 +40,13 @@ namespace SiteMonitor.Runner
 
         protected abstract bool Run(IWebDriver driver);
 
-        private void Setup()
+        protected virtual void Setup()
         {
             //TODO: Make it a parameter
             _driver = new FirefoxDriver();
         }
 
-        private void TearDown()
+        protected virtual void TearDown()
         {
             _driver.Quit();
         }

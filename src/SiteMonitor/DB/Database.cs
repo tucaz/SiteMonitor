@@ -10,10 +10,11 @@ using System.IO;
 using SiteMonitor.Reporting;
 
 namespace SiteMonitor.DB
-{    
+{
     public class Database
     {
         private static bool _databaseCreated = false;
+        private static volatile object _syncLock = new object();
 
         public List<string> GetAllRunners()
         {
@@ -30,7 +31,7 @@ namespace SiteMonitor.DB
 
                 return runners.ToList();
             }
-        }      
+        }
 
         public RunResultsForRunner GetRunResults(string runnerName, DateTime from, DateTime to)
         {
@@ -90,27 +91,30 @@ namespace SiteMonitor.DB
 
             if (!_databaseCreated)
             {
-                if (!File.Exists(databaseLocation))
+                lock (_syncLock)
                 {
-                    connection = new SQLiteConnection(connectionString);
-                    connection.Open();
+                    if (!File.Exists(databaseLocation))
+                    {
+                        connection = new SQLiteConnection(connectionString);
+                        connection.Open();
 
-                    var createTable = @"CREATE TABLE RunResults (                                        
+                        var createTable = @"CREATE TABLE RunResults (                                        
                                         TestName VARCHAR(50),
                                         RanAt DATETIME,
                                         TimeTaken LONG,
                                         TimeTakenFormatted VARCHAR(10)
                                     )";
 
-                    connection.Execute(createTable);
-                }
-                else
-                {
-                    connection = new SQLiteConnection(connectionString);
-                    connection.Open();
-                }
+                        connection.Execute(createTable);
+                    }
+                    else
+                    {
+                        connection = new SQLiteConnection(connectionString);
+                        connection.Open();
+                    }
 
-                _databaseCreated = true;
+                    _databaseCreated = true;
+                }
             }
             else
             {
@@ -120,5 +124,5 @@ namespace SiteMonitor.DB
 
             return connection;
         }
-    }    
+    }
 }

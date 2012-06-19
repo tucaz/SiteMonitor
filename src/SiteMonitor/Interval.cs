@@ -17,6 +17,11 @@ namespace SiteMonitor
             return DateTime.Now.AddHours(hours * -1);
         }
 
+        public static int ToMilliseconds(this int minutes)
+        {
+            return (minutes * 60000);
+        }
+
         public static DateTime FromInterval(this string interval)
         {
             try

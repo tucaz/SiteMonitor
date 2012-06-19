@@ -1,4 +1,5 @@
-﻿using SiteMonitor.Tests.SampleRunners;
+﻿using System.Threading;
+using SiteMonitor.Tests.SampleRunners;
 
 namespace SiteMonitor.Tests
 {
@@ -7,10 +8,9 @@ namespace SiteMonitor.Tests
         public static void Main()
         {
             Monitor.AddRunner(new RandomTimeRunner());
-            for (int i = 0; i < 100; i++)
-            {
-                Monitor.StartMonitoring();
-            }            
+            Monitor.StartMonitoring(1);            
+
+            Thread.Sleep(6000000);
         }
     }
 }

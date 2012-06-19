@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
-using SiteMonitor.Runner;
-using SiteMonitor.DB;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System;
+using System.Threading;
+using System.Threading.Tasks;
+using SiteMonitor.DB;
+using SiteMonitor.Runner;
 
 namespace SiteMonitor
 {
@@ -13,6 +14,10 @@ namespace SiteMonitor
         
         private static List<BaseRunner> _runners = new List<BaseRunner>();
                 
+        /// <summary>
+        /// Add a test runner to the runner's pool that will be monitored
+        /// </summary>
+        /// <param name="runner">An instance of BaseRunner</param>
         public static void AddRunner(BaseRunner runner)
         {
             _runners.Add(runner);
@@ -33,6 +38,14 @@ namespace SiteMonitor
             results.ForEach(x => db.SaveRunResults(x));
         }
 
+        /// <summary>
+        /// Stops all runners
+        /// </summary>
+        public static void StopAll()
+        {
+            _timer.Dispose();
+        }
+
         private static void Run(object state)
         {
             Debug.WriteLine("Starting to run");
@@ -43,18 +56,19 @@ namespace SiteMonitor
         }
 
         private static List<RunResults> RunAllRunners()
-        {
-            var results = new List<RunResults>();
+        {            
+            var results = new List<RunResults>();            
             
-            foreach (var runner in _runners)
-            {
-                var result = new RunResults(runner.RunnerName);
-                runner.Run();
+            Parallel.ForEach(_runners, x => {
+                Debug.WriteLine(DateTime.Now.ToString() + " - Running: " + x.RunnerName);
+                
+                var result = new RunResults(x.RunnerName);
+                x.Run();
 
-                result.TicksTaken = runner.TimeTaken.Ticks;
+                result.TicksTaken = x.TimeTaken.Ticks;
                 results.Add(result);
-            }
-
+            });
+         
             return results;
         }
 

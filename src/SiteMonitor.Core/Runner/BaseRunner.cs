@@ -3,7 +3,7 @@ using System.Diagnostics;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
 
-namespace SiteMonitor.Runner
+namespace SiteMonitor.Core.Runner
 {
     public abstract class BaseRunner
     {

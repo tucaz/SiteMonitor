@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SiteMonitor.Runner;
-using System.Data.SQLite;
 using System.Data.Common;
-using Dapper;
+using System.Data.SQLite;
 using System.IO;
-using SiteMonitor.Reporting;
+using System.Linq;
+using Dapper;
+using SiteMonitor.Core.Reporting;
+using SiteMonitor.Core.Runner;
 
-namespace SiteMonitor.DB
+namespace SiteMonitor.Core.DB
 {
     public class Database
     {

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using SiteMonitor.DB;
-using SiteMonitor.Reporting;
-using SiteMonitor;
+using SiteMonitor.Core;
+using SiteMonitor.Core.DB;
+using SiteMonitor.Core.Reporting;
 
 namespace WebMonitor.API
 {

@@ -8,8 +8,8 @@
     <ProjectGuid>{D27E1D8A-7B63-4858-AD01-A10A641E7FF7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SiteMonitor</RootNamespace>
-    <AssemblyName>SiteMonitor</AssemblyName>
+    <RootNamespace>SiteMonitor.Core</RootNamespace>
+    <AssemblyName>SiteMonitor.Core</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -43,6 +43,9 @@
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\packages\Newtonsoft.Json.4.5.1\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -70,6 +73,8 @@
   <ItemGroup>
     <Compile Include="DB\Database.cs" />
     <Compile Include="Interval.cs" />
+    <Compile Include="Log\Logger.cs" />
+    <Compile Include="Log\LoggerExtensions.cs" />
     <Compile Include="Monitor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Reporting\RunResultsForRunner.cs" />

@@ -11,7 +11,7 @@
     <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SiteMonitor.UI</RootNamespace>
+    <RootNamespace>SiteMonitor.Core.UI</RootNamespace>
     <AssemblyName>SiteMonitor.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
@@ -138,15 +138,14 @@
       <DependentUpon>Web.config</DependentUpon>
     </Content>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
-    <Content Include="packages.config" />
+    <ProjectReference Include="..\SiteMonitor.Core\SiteMonitor.Core.csproj">
+      <Project>{d27e1d8a-7b63-4858-ad01-a10a641e7ff7}</Project>
+      <Name>SiteMonitor.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiteMonitor\SiteMonitor.csproj">
-      <Project>{d27e1d8a-7b63-4858-ad01-a10a641e7ff7}</Project>
-      <Name>SiteMonitor</Name>
-    </ProjectReference>
+    <Content Include="packages.config" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

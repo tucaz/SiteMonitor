@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
-using SiteMonitor.DB;
-using SiteMonitor.Runner;
+using SiteMonitor.Core.DB;
+using SiteMonitor.Core.Runner;
 
-namespace SiteMonitor
+namespace SiteMonitor.Core
 {
     public static class Monitor
     {

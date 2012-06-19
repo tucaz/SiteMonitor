@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Threading;
 using OpenQA.Selenium;
-using SiteMonitor.Runner;
+using SiteMonitor.Core.Runner;
 
 namespace SiteMonitor.Tests.SampleRunners
 {

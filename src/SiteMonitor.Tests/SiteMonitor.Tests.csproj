@@ -8,7 +8,7 @@
     <ProjectGuid>{C8F10879-0D9B-46D1-9975-B1FF3B9941D1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SiteMonitor.Tests</RootNamespace>
+    <RootNamespace>SiteMonitor.Core.Tests</RootNamespace>
     <AssemblyName>SiteMonitor.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -71,16 +71,15 @@
     <Compile Include="MonitorTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleRunners\RandomTimeRunner.cs" />
-    <Compile Include="Reporting\AssetsTest.cs" />
     <Compile Include="Runner\BaseRunnerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SiteMonitor\SiteMonitor.csproj">
-      <Project>{D27E1D8A-7B63-4858-AD01-A10A641E7FF7}</Project>
-      <Name>SiteMonitor</Name>
+    <ProjectReference Include="..\SiteMonitor.Core\SiteMonitor.Core.csproj">
+      <Project>{d27e1d8a-7b63-4858-ad01-a10a641e7ff7}</Project>
+      <Name>SiteMonitor.Core</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

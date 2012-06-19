@@ -1,6 +1,6 @@
 ﻿using NUnit.Framework;
 using SharpTestsEx;
-using SiteMonitor.Runner;
+using SiteMonitor.Core.Runner;
 using SiteMonitor.Tests.SampleRunners;
 
 namespace SiteMonitor.Tests.Runner

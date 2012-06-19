@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using OpenQA.Selenium;
-using SiteMonitor.Runner;
+using SiteMonitor.Core.Runner;
 
 namespace SiteMonitor.Tests.SampleRunners
 {
@@ -22,7 +19,7 @@ namespace SiteMonitor.Tests.SampleRunners
         {
             get
             {
-                return "RandomRunner";
+                return "RandomTimeRunner";
             }
         }
         

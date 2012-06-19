@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SiteMonitor.Runner
+namespace SiteMonitor.Core.Runner
 {
     public class RunResults
     {

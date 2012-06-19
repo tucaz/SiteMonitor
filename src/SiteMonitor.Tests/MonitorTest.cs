@@ -1,5 +1,6 @@
-﻿using System.Threading;
+﻿using SiteMonitor.Core;
 using SiteMonitor.Tests.SampleRunners;
+using T = System.Threading;
 
 namespace SiteMonitor.Tests
 {
@@ -11,7 +12,7 @@ namespace SiteMonitor.Tests
             Monitor.AddRunner(new FixedTimeRunner(500));
             Monitor.StartMonitoring(1);            
 
-            Thread.Sleep(6000000);
+            T.Thread.Sleep(6000000);
         }
     }
 }

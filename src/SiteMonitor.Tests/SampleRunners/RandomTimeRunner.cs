@@ -8,9 +8,13 @@ namespace SiteMonitor.Tests.SampleRunners
 {
     internal class RandomTimeRunner : BaseRunner
     {        
-        private int? _maxRunTime;
+        private int _maxRunTime;
 
-        public RandomTimeRunner(int? maxRunTime = 500)
+        public RandomTimeRunner() : this(500)
+        {
+        }
+        
+        public RandomTimeRunner(int maxRunTime)
         {
             this._maxRunTime = maxRunTime;
         }
@@ -33,7 +37,7 @@ namespace SiteMonitor.Tests.SampleRunners
         
         protected override bool Run(IWebDriver driver)
         {
-            var sleepTime = new Random(DateTime.Now.Millisecond).Next(this._maxRunTime.Value);
+            var sleepTime = new Random(DateTime.Now.Millisecond).Next(this._maxRunTime);
             
             Debug.WriteLine(sleepTime);
             Thread.Sleep(sleepTime);

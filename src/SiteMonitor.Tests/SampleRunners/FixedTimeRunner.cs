@@ -9,7 +9,11 @@ namespace SiteMonitor.Tests.SampleRunners
     {
         private int _runTime;
 
-        public FixedTimeRunner(int runTime = 500)
+        public FixedTimeRunner() : this(500)
+        {
+        }
+
+        public FixedTimeRunner(int runTime)
         {
             this._runTime = runTime;
         }

@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using SiteMonitor.Core.DB;
@@ -11,9 +14,16 @@ namespace SiteMonitor.Core
     public static class Monitor
     {
         private static Timer _timer;
-        
+
         private static List<BaseRunner> _runners = new List<BaseRunner>();
-                
+        public static List<BaseRunner> RunnersLoaded
+        {
+            get
+            {
+                return _runners;
+            }
+        }
+
         /// <summary>
         /// Add a test runner to the runner's pool that will be monitored
         /// </summary>
@@ -21,6 +31,21 @@ namespace SiteMonitor.Core
         public static void AddRunner(BaseRunner runner)
         {
             _runners.Add(runner);
+        }
+
+        /// <summary>
+        /// Scans the informed assembly looking for test runners inheriting from BaseRunner
+        /// </summary>
+        /// <param name="assemblyPath">Full path to the assembly</param>
+        public static void AddRunnersFromAssembly(string assemblyPath)
+        {
+            if (!File.Exists(assemblyPath))
+                throw new FileNotFoundException("Assembly not found", assemblyPath);
+
+            Assembly.LoadFrom(assemblyPath)
+                .GetTypes().Where(x => x.BaseType == typeof(BaseRunner))
+                .Select(x => (BaseRunner)Activator.CreateInstance(x)).ToList()
+                .ForEach(AddRunner);
         }
 
         /// <summary>
@@ -50,28 +75,27 @@ namespace SiteMonitor.Core
         {
             Debug.WriteLine("Starting to run");
             Debug.WriteLine(DateTime.Now.ToString());
-            
+
             var results = RunAllRunners();
             SaveResults(results);
         }
 
         private static List<RunResults> RunAllRunners()
-        {            
-            var results = new List<RunResults>();            
-            
-            Parallel.ForEach(_runners, x => {
+        {
+            var results = new List<RunResults>();
+
+            Parallel.ForEach(_runners, x =>
+            {
                 Debug.WriteLine(DateTime.Now.ToString() + " - Running: " + x.RunnerName);
-                
+
                 var result = new RunResults(x.RunnerName);
                 x.Run();
 
                 result.TicksTaken = x.TimeTaken.Ticks;
                 results.Add(result);
             });
-         
+
             return results;
         }
-
-        
     }
 }

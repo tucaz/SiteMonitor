@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using SiteMonitor.Core.DB;
 using SiteMonitor.Core.Runner;
+using SiteMonitor.Core.Log;
 
 namespace SiteMonitor.Core
 {
@@ -42,10 +43,14 @@ namespace SiteMonitor.Core
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException("Assembly not found", assemblyPath);
 
-            Assembly.LoadFrom(assemblyPath)
+            var testRunners = Assembly.LoadFrom(assemblyPath)
                 .GetTypes().Where(x => x.BaseType == typeof(BaseRunner))
-                .Select(x => (BaseRunner)Activator.CreateInstance(x)).ToList()
-                .ForEach(AddRunner);
+                .Select(x => (BaseRunner)Activator.CreateInstance(x)).ToList();
+
+            testRunners.ForEach(AddRunner);
+
+            "Test runners found:".LogInformation();
+            testRunners.ForEach(x => "\t\t{0}".LogInformation(x.RunnerName));
         }
 
         /// <summary>
@@ -54,13 +59,18 @@ namespace SiteMonitor.Core
         /// <param name="interval">Interval between runs (in minutes)</param>
         public static void StartMonitoring(int interval)
         {
+            "Using {0} minutes as interval".LogInformation(interval);
+
+            "Starting monitoring".LogInformation();
             _timer = new Timer(new TimerCallback(Run), null, 500, interval.ToMilliseconds());
         }
 
         private static void SaveResults(List<RunResults> results)
         {
+            "Persisting results".LogInformation();
             var db = new Database();
             results.ForEach(x => db.SaveRunResults(x));
+            "Results saved".LogInformation();
         }
 
         /// <summary>
@@ -73,8 +83,7 @@ namespace SiteMonitor.Core
 
         private static void Run(object state)
         {
-            Debug.WriteLine("Starting to run");
-            Debug.WriteLine(DateTime.Now.ToString());
+            "Starting to run".LogInformation();
 
             var results = RunAllRunners();
             SaveResults(results);
@@ -86,13 +95,15 @@ namespace SiteMonitor.Core
 
             Parallel.ForEach(_runners, x =>
             {
-                Debug.WriteLine(DateTime.Now.ToString() + " - Running: " + x.RunnerName);
+                "Running {0}".LogInformation(x.RunnerName);
 
                 var result = new RunResults(x.RunnerName);
                 x.Run();
 
                 result.TicksTaken = x.TimeTaken.Ticks;
                 results.Add(result);
+
+                "Finished running {0}. Time taken: {1}ms".LogInformation(x.RunnerName, x.TimeTaken.TotalMilliseconds);
             });
 
             return results;

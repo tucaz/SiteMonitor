@@ -40,9 +40,15 @@
     <MSBuild Projects="@(MonitorProjectFile)" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(MonitorBuildDir)"/>
   </Target>
   
-  <Target Name="BuildWeb" DependsOnTargets="GenerateAssemblyInfo">
-    <MSBuild Projects="@(WebProjectFile)" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(WebMonitorBuildDir)"/>
+  <Target Name="BuildWeb">
+	  <RemoveDir Directories="$(WebMonitorBuildDir)"
+				 ContinueOnError="true" />
+	  <MSBuild Projects="@(WebProjectFile)"
+			   Targets="ResolveReferences;_CopyWebApplication"
+			   Properties="WebProjectOutputDir=$(WebMonitorBuildDir);
+			   OutDir=$(WebMonitorBuildDir)\" />
   </Target>
+  
   
   <Target Name="BuildAll">
     <CallTarget Targets="Clean; BuildMonitor; BuildWeb; Test"></CallTarget>

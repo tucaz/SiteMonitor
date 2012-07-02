@@ -12,8 +12,12 @@ namespace SiteMonitor
 {
     class Program
     {
+        private static Monitor _monitor;
+        
         static void Main(string[] args)
         {
+            _monitor = new Monitor();
+            
             "Initializing Site Monitor".LogInformation();
             
             var arguments = new Arguments();
@@ -26,9 +30,9 @@ namespace SiteMonitor
                 {                    
                     var interval = arguments.Interval.HasValue ? arguments.Interval.Value : 5;                   
 
-                    LoadTestRunners(arguments);                    
-                    
-                    Monitor.StartMonitoring(interval);                    
+                    LoadTestRunners(arguments);
+
+                    _monitor.StartMonitoring(interval);                    
                 }
 
                 if(arguments.WebInterface)
@@ -41,7 +45,7 @@ namespace SiteMonitor
                 if(arguments.Monitor)
                 {
                     "Stoping test runners".LogInformation();
-                    Monitor.StopAll();
+                    _monitor.StopAll();
                 }
             }            
             
@@ -56,7 +60,7 @@ namespace SiteMonitor
             {
                 try
                 {
-                    Monitor.AddRunnersFromAssembly(assemblyPath);
+                    _monitor.AddRunnersFromAssembly(assemblyPath);
                 }
                 catch (FileNotFoundException ex)
                 {

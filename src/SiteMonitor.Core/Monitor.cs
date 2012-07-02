@@ -12,12 +12,12 @@ using SiteMonitor.Core.Log;
 
 namespace SiteMonitor.Core
 {
-    public static class Monitor
+    public class Monitor
     {
-        private static Timer _timer;
+        private Timer _timer;
 
-        private static List<BaseRunner> _runners = new List<BaseRunner>();
-        public static List<BaseRunner> RunnersLoaded
+        private List<BaseRunner> _runners = new List<BaseRunner>();
+        public List<BaseRunner> RunnersLoaded
         {
             get
             {
@@ -29,7 +29,7 @@ namespace SiteMonitor.Core
         /// Add a test runner to the runner's pool that will be monitored
         /// </summary>
         /// <param name="runner">An instance of BaseRunner</param>
-        public static void AddRunner(BaseRunner runner)
+        public void AddRunner(BaseRunner runner)
         {
             _runners.Add(runner);
         }
@@ -38,7 +38,7 @@ namespace SiteMonitor.Core
         /// Scans the informed assembly looking for test runners inheriting from BaseRunner
         /// </summary>
         /// <param name="assemblyPath">Full path to the assembly</param>
-        public static void AddRunnersFromAssembly(string assemblyPath)
+        public void AddRunnersFromAssembly(string assemblyPath)
         {
             if (!File.Exists(assemblyPath))
                 throw new FileNotFoundException("Assembly not found", assemblyPath);
@@ -57,7 +57,7 @@ namespace SiteMonitor.Core
         /// Starts the monitoring with given interval
         /// </summary>
         /// <param name="interval">Interval between runs (in minutes)</param>
-        public static void StartMonitoring(int interval)
+        public void StartMonitoring(int interval)
         {
             "Using {0} minutes as interval".LogInformation(interval);
 
@@ -65,7 +65,7 @@ namespace SiteMonitor.Core
             _timer = new Timer(new TimerCallback(Run), null, 500, interval.ToMilliseconds());
         }
 
-        private static void SaveResults(List<RunResults> results)
+        private void SaveResults(List<RunResults> results)
         {
             "Persisting results".LogInformation();
             var db = new Database();
@@ -76,12 +76,12 @@ namespace SiteMonitor.Core
         /// <summary>
         /// Stops all runners
         /// </summary>
-        public static void StopAll()
+        public void StopAll()
         {
             _timer.Dispose();
         }
 
-        private static void Run(object state)
+        private void Run(object state)
         {
             "Starting to run".LogInformation();
 
@@ -89,7 +89,7 @@ namespace SiteMonitor.Core
             SaveResults(results);
         }
 
-        private static List<RunResults> RunAllRunners()
+        private List<RunResults> RunAllRunners()
         {
             var results = new List<RunResults>();
 

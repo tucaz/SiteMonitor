@@ -6,7 +6,7 @@ using SiteMonitor.Core;
 using SiteMonitor.Core.DB;
 using SiteMonitor.Core.Reporting;
 
-namespace WebMonitor.API
+namespace SiteMonitor.API
 {
     public class RunnerController : ApiController
     {

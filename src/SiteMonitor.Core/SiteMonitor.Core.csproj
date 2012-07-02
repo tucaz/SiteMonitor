@@ -37,9 +37,6 @@
     <Reference Include="Dapper">
       <HintPath>..\packages\Dapper.1.9\lib\net40\Dapper.dll</HintPath>
     </Reference>
-    <Reference Include="IISExpress.Automation">
-      <HintPath>..\packages\IISExpress.Automation.0.1.1\lib\net40\IISExpress.Automation.dll</HintPath>
-    </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.1.8\lib\net20\Ionic.Zip.dll</HintPath>
     </Reference>

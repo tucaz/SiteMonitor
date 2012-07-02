@@ -26,3 +26,13 @@ _ReSharper.*
 *\Obj
 *\bin
 *\Bin
+*.dotCover
+build/
+TestResult.xml
+*.user
+*.pdb
+*/*.ncrunchsolution*
+src/GlobalInfo.cs
+._*
+*.ncrunchproject
+*.cache

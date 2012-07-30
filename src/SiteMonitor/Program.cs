@@ -34,7 +34,7 @@ namespace SiteMonitor
                     if (arguments.Monitor)
                     {
                         var interval = arguments.Interval.HasValue ? arguments.Interval.Value : 5;
-                        
+
                         LoadTestRunners(arguments);
 
                         _monitor.StartMonitoring(interval);
@@ -44,20 +44,28 @@ namespace SiteMonitor
                     {
                         "Initializing web interface".LogInformation();
 
-                        var webInterfacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Web");
+                        var webInterfacePath = String.Empty;
+
+#if DEBUG
+                        webInterfacePath = @"C:\temp\SiteMonitor"; //this was created locally with the "Publish" feature in the UI project
+#else
+                        webInterfacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Web");
+#endif
 
                         "Loading web site located in {0}".LogDebug(webInterfacePath);
+
+                        var port = arguments.Port ?? 12345;
                         
                         _iis = new IISExpress(new Parameters
                         {
                             Path = webInterfacePath,
-                            Port = 667
+                            Port = port
                         });
 
+                        ("Web interface initialized at http://localhost:" + port.ToString()).LogInformation();
+                        Console.WriteLine("Press any key to finish it");
+                        Console.Read();
                     }
-
-                    Console.WriteLine("Press Enter to quit Site Monitor");
-                    Console.Read();
                 }
                 finally
                 {
@@ -76,6 +84,9 @@ namespace SiteMonitor
             }
 
             "Site Monitor finished".LogInformation();
+
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine("Press any key to quit Site Monitor");
             Console.Read();
         }
 

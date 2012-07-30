@@ -9,8 +9,8 @@ namespace SiteMonitor
         [Option(null, "web", HelpText = "Specifies whether or not this instance should expose the web interface")]
         public bool WebInterface { get; set; }        
 
-        [Option(null, "baseUrl", HelpText = "Base url for the web interface. Works together with /web switch")]
-        public bool BaseUrl { get; set; }
+        [Option(null, "port", HelpText = "Port where the web interface will be hosted. Works together with /web switch")]
+        public int? Port { get; set; }
 
         [Option(null, "monitor", HelpText = "Specifies whether or not this instance should run the monitoring tests")]
         public bool Monitor { get; set; }
@@ -33,8 +33,8 @@ namespace SiteMonitor
             
             this.HandleParsingErrorsInHelp(help);            
             
-            help.AddPreOptionsLine("Usage: SiteMonitor.exe [web] [baseUrl] [monitor] [interval] [assembly]");
-            help.AddPreOptionsLine(@"Example: SiteMonitor.exe --web --baseUrl=http://localhost:8080 --monitor --interval=5 --assembly C:\myAssembly1.dll C:\myAssembly2.dll");
+            help.AddPreOptionsLine("Usage: SiteMonitor.exe [web] [port] [monitor] [interval] [assembly]");
+            help.AddPreOptionsLine(@"Example: SiteMonitor.exe --web --port=12345 --monitor --interval=5 --assembly C:\myAssembly1.dll C:\myAssembly2.dll");
             help.AddOptions(this);
 
             return help;

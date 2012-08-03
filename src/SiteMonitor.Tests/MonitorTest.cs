@@ -32,14 +32,5 @@ namespace SiteMonitor.Tests
 
             _monitor.RunnersLoaded.Count.Should().Be.EqualTo(3);
         }
-
-        //public static void Main()
-        //{
-        //    Monitor.AddRunner(new RandomTimeRunner());
-        //    Monitor.AddRunner(new FixedTimeRunner(500));
-        //    Monitor.StartMonitoring(1);            
-
-        //    T.Thread.Sleep(6000000);
-        //}
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using CommandLine;
 using IISExpressAutomation;
 using SiteMonitor.Core;
+using SiteMonitor.Core.DB;
 using SiteMonitor.Core.Log;
 
 namespace SiteMonitor
@@ -15,13 +17,14 @@ namespace SiteMonitor
     class Program
     {
         private static Monitor _monitor;
-        private static IISExpress _iis;
 
         static void Main(string[] args)
         {
-            _monitor = new Monitor();
-
             "Initializing Site Monitor".LogInformation();
+            _monitor = new Monitor();
+            
+            _monitor.InitializeDatabase(Database.ReadDatabasePathFromConfig());            
+            "Database initialized".LogInformation();            
 
             var arguments = new Arguments();
 
@@ -44,28 +47,14 @@ namespace SiteMonitor
                     {
                         "Initializing web interface".LogInformation();
 
-                        var webInterfacePath = String.Empty;
-
-#if DEBUG
-                        webInterfacePath = @"C:\temp\SiteMonitor"; //this was created locally with the "Publish" feature in the UI project
-#else
-                        webInterfacePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Web");
-#endif
-
-                        "Loading web site located in {0}".LogDebug(webInterfacePath);
-
                         var port = arguments.Port ?? 12345;
-                        
-                        _iis = new IISExpress(new Parameters
-                        {
-                            Path = webInterfacePath,
-                            Port = port
-                        });
+                        _monitor.StartAPISelfHost(port);
 
-                        ("Web interface initialized at http://localhost:" + port.ToString()).LogInformation();
-                        Console.WriteLine("Press any key to finish it");
-                        Console.Read();
+                        ("Web interface initialized at http://localhost:" + port.ToString()).LogInformation();                        
                     }
+
+                    Console.WriteLine("Press any key to finish it");
+                    Console.Read();
                 }
                 finally
                 {
@@ -77,8 +66,8 @@ namespace SiteMonitor
 
                     if (arguments.WebInterface)
                     {
-                        "Shutting down IIS Express".LogInformation();
-                        _iis.Dispose();
+                        "Shutting web interface".LogInformation();                        
+                        _monitor.StopAPISelfHost();
                     }
                 }
             }
@@ -88,6 +77,17 @@ namespace SiteMonitor
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine("Press any key to quit Site Monitor");
             Console.Read();
+        }
+
+        private static string GetDatabasePath()
+        {
+            if (ConfigurationManager.AppSettings["DatabasePath"] == null)
+            {
+                throw new ArgumentNullException("DatabasePath", "An entry for the database file location was not found in the AppSettings");
+            }
+
+            var databasePath = ConfigurationManager.AppSettings["DatabasePath"];
+            return databasePath;
         }
 
         private static void LoadTestRunners(Arguments arguments)
@@ -102,6 +102,15 @@ namespace SiteMonitor
                 catch (FileNotFoundException ex)
                 {
                     ex.LogError();
+                }
+                catch (ReflectionTypeLoadException ex)
+                {
+                    ex.LogError();
+
+                    if (ex.LoaderExceptions != null)
+                    {
+                        ex.LoaderExceptions.ToList().ForEach(x => x.LogError());
+                    }
                 }
             }
         }

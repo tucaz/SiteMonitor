@@ -9,9 +9,9 @@ namespace SiteMonitor.Core.Reporting
         {
             this.Entries = new List<Entry>();
         }
-        
-        public long LowerScale { get; set; }
-        public long UpperScale { get; set; }
+
+        public string YAxisLegend { get; set; }
+        public string Title { get; set; }
         public List<Entry> Entries { get; set; }
     }
 

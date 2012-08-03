@@ -19,6 +19,22 @@ namespace SiteMonitor.Core.Runner
             }
         }
 
+        public virtual string Title
+        {
+            get
+            {
+                return String.Empty;
+            }
+        }
+
+        public virtual string YAxisLegend
+        {
+            get
+            {
+                return "Time Taken (seconds)";
+            }
+        }
+
         public void Run()
         {
             Setup();
@@ -49,6 +65,6 @@ namespace SiteMonitor.Core.Runner
         protected virtual void TearDown()
         {
             _driver.Quit();
-        }
+        }        
     }
 }

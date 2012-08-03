@@ -1,20 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http.SelfHost;
 using SiteMonitor.Core.DB;
-using SiteMonitor.Core.Runner;
 using SiteMonitor.Core.Log;
+using SiteMonitor.Core.Runner;
+using System.Web.Http;
+using System.Web.Mvc;
+using System.Web.Routing;
 
 namespace SiteMonitor.Core
 {
     public class Monitor
     {
         private Timer _timer;
+        private string _databasePath;
+        private Database _db;
+        private HttpSelfHostServer _httpServer;
 
         private List<BaseRunner> _runners = new List<BaseRunner>();
         public List<BaseRunner> RunnersLoaded
@@ -23,6 +29,17 @@ namespace SiteMonitor.Core
             {
                 return _runners;
             }
+        }
+
+        public Monitor()
+        {
+        }
+
+        public void InitializeDatabase(string databasePath)
+        {
+            this._databasePath = databasePath;
+            this._db = new Database(this._databasePath);
+            this._db.CreateDatabaseIfNeeded();
         }
 
         /// <summary>
@@ -68,8 +85,7 @@ namespace SiteMonitor.Core
         private void SaveResults(List<RunResults> results)
         {
             "Persisting results".LogInformation();
-            var db = new Database();
-            results.ForEach(x => db.SaveRunResults(x));
+            results.ForEach(x => this._db.SaveRunResults(x));
             "Results saved".LogInformation();
         }
 
@@ -97,8 +113,16 @@ namespace SiteMonitor.Core
             {
                 "Running {0}".LogInformation(x.RunnerName);
 
-                var result = new RunResults(x.RunnerName);
-                x.Run();
+                var result = new RunResults(x.RunnerName, x.Title, x.YAxisLegend);
+
+                try
+                {
+                    x.Run();
+                }
+                catch
+                {
+                    result.Error = 1;
+                }
 
                 result.TicksTaken = x.TimeTaken.Ticks;
                 results.Add(result);
@@ -107,6 +131,32 @@ namespace SiteMonitor.Core
             });
 
             return results;
+        }
+
+        public void StartAPISelfHost(int port)
+        {
+            var config = new HttpSelfHostConfiguration("http://localhost:" + port.ToString());
+
+            config.Routes.MapHttpRoute(
+                name: "StaticFile",
+                routeTemplate: "static/{folder}/{file}",                
+                defaults: new { controller = "StaticFile", action = "Get" }
+            );
+
+            config.Routes.MapHttpRoute(
+                name: "Api",
+                routeTemplate: "api/{controller}/{action}/{id}",
+                defaults: new { action = "Get", id = RouteParameter.Optional }
+            );
+
+            _httpServer = new HttpSelfHostServer(config);
+            _httpServer.OpenAsync().Wait();
+        }
+
+        public void StopAPISelfHost()
+        {
+            _httpServer.CloseAsync().Wait();
+            _httpServer.Dispose();
         }
     }
 }

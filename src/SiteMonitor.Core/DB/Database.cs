@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
@@ -12,8 +13,20 @@ namespace SiteMonitor.Core.DB
 {
     public class Database
     {
-        private static bool _databaseCreated = false;
-        private static volatile object _syncLock = new object();
+        private string _databasePath = String.Empty;
+
+        private string ConnectionString
+        {
+            get
+            {
+                return String.Concat("Data Source=", this._databasePath, ";Version=3;Pooling=False;Max Pool Size=20;");
+            }
+        }
+
+        public Database(string databasePath)
+        {
+            this._databasePath = databasePath;
+        }
 
         public List<string> GetAllRunners()
         {
@@ -38,27 +51,39 @@ namespace SiteMonitor.Core.DB
 
             using (var conn = CreateConnection())
             {
-                var sql = @"SELECT 
-                                        TestName as RunnerName,
-                                        RanAt,
-                                        TimeTaken as TicksTaken
-                                     FROM
-                                        RunResults
-                                     WHERE
-                                        TestName = @RunnerName
-                                     AND
-                                        RanAt BETWEEN @From AND @To
-                                     ORDER BY
-                                        RanAt ASC";
+                var sql = @"SELECT
+                                Title,
+                                YAxisLegend
+                            FROM
+                                RunResults
+                            WHERE
+                                TestName = @RunnerName
+                            AND
+                                RanAt BETWEEN @From AND @To
+                            ORDER BY
+                                RanAt ASC
+                            LIMIT 5";
+
+                var runnerInformation = conn.Query<RunResultsForRunner>(sql, new { RunnerName = runnerName, From = from, To = to }).First();
+
+                sql = @"SELECT 
+                                TestName as RunnerName,
+                                RanAt,
+                                TimeTaken as TicksTaken
+                            FROM
+                                RunResults
+                            WHERE
+                                TestName = @RunnerName
+                            AND
+                                RanAt BETWEEN @From AND @To
+                            ORDER BY
+                                RanAt ASC";
 
                 var runResults = conn.Query<RunResults>(sql, new { RunnerName = runnerName, From = from, To = to });
 
-                var results = new RunResultsForRunner()
-                {
-                    Entries = runResults.Select(x => new Entry() { RanAt = x.RanAt, TimeTaken = new TimeSpan(x.TicksTaken).TotalSeconds }).ToList()
-                };
+                runnerInformation.Entries = runResults.Select(x => new Entry() { RanAt = x.RanAt, TimeTaken = new TimeSpan(x.TicksTaken).TotalSeconds }).ToList();
 
-                return results;
+                return runnerInformation;
             }
         }
 
@@ -69,59 +94,74 @@ namespace SiteMonitor.Core.DB
                 var sql = @"INSERT INTO 
                                 RunResults
                                 (TestName,
+                                Title,
+                                YAxisLegend,
                                 RanAt,
                                 TimeTaken,
-                                TimeTakenFormatted)
+                                TimeTakenFormatted,
+                                Error)
                             VALUES
                                 (@TestName,
+                                @Title,
+                                @YAxisLegend,
                                 @RanAt,
                                 @TimeTaken,
-                                @TimeTakenFormatted)";
+                                @TimeTakenFormatted,
+                                @Error)";
 
-                conn.Execute(sql, new { TestName = results.RunnerName, RanAt = results.RanAt, TimeTaken = results.TicksTaken, TimeTakenFormatted = results.TimeTakenFormatted });
+                conn.Execute(sql, new
+                {
+                    TestName = results.RunnerName,
+                    Title = results.Title,
+                    YAxisLegend = results.YAxisLegend,
+                    RanAt = results.RanAt,
+                    TimeTaken = results.TicksTaken,
+                    TimeTakenFormatted = results.TimeTakenFormatted,
+                    Error = results.Error
+                });
             }
         }
 
-        private static DbConnection CreateConnection()
+        public void CreateDatabaseIfNeeded()
         {
-            var databaseLocation = @"C:\temp\WebMonitor.sqlite";
-            var connectionString = "Data Source=" + databaseLocation + ";Version=3;Pooling=False;Max Pool Size=20;";
             SQLiteConnection connection = null;
 
-            if (!_databaseCreated)
+            if (!File.Exists(this._databasePath))
             {
-                lock (_syncLock)
-                {
-                    if (!File.Exists(databaseLocation))
-                    {
-                        connection = new SQLiteConnection(connectionString);
-                        connection.Open();
-
-                        var createTable = @"CREATE TABLE RunResults (                                        
-                                        TestName VARCHAR(50),
-                                        RanAt DATETIME,
-                                        TimeTaken LONG,
-                                        TimeTakenFormatted VARCHAR(10)
-                                    )";
-
-                        connection.Execute(createTable);
-                    }
-                    else
-                    {
-                        connection = new SQLiteConnection(connectionString);
-                        connection.Open();
-                    }
-
-                    _databaseCreated = true;
-                }
-            }
-            else
-            {
-                connection = new SQLiteConnection(connectionString);
+                connection = new SQLiteConnection(this.ConnectionString);
                 connection.Open();
+
+                var createTable = @"CREATE TABLE RunResults (                                        
+                                            TestName VARCHAR(50),
+                                            Title VARCHAR(255),
+                                            YAxisLegend VARCHAR(255),                                        
+                                            RanAt DATETIME,
+                                            TimeTaken LONG,
+                                            TimeTakenFormatted VARCHAR(10),
+                                            Error INTEGER
+                                        )";
+
+                connection.Execute(createTable);
             }
+        }
+
+        private DbConnection CreateConnection()
+        {
+            SQLiteConnection connection = new SQLiteConnection(this.ConnectionString);
+            connection.Open();
 
             return connection;
+        }
+
+        public static string ReadDatabasePathFromConfig()
+        {
+            if (ConfigurationManager.AppSettings["DatabasePath"] == null)
+            {
+                throw new ArgumentNullException("DatabasePath", "An entry for the database file location was not found in the AppSettings");
+            }
+
+            var databasePath = ConfigurationManager.AppSettings["DatabasePath"];
+            return databasePath;
         }
     }
 }

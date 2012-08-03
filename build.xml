@@ -1,10 +1,7 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Test"> 
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="BuildAll"> 
   <PropertyGroup> 
-    <MonitorBuildDir>$(MSBuildProjectDirectory)\build\</MonitorBuildDir>
-	<WebMonitorBuildDir>$(MonitorBuildDir)\Web\</WebMonitorBuildDir>
-
-	<TestAssembly>$(MonitorBuildDir)SiteMonitor.Tests.dll</TestAssembly>
-	
+    <BuildDir>$(MSBuildProjectDirectory)\build\</BuildDir>
+    <TestAssembly>$(BuildDir)SiteMonitor.Tests.dll</TestAssembly>	
     <SourceDir>src\</SourceDir>
     <Configuration>Release</Configuration>
     <Platform>Any CPU</Platform>
@@ -13,15 +10,14 @@
 
   <ItemGroup>
     <MonitorProjectFile Include="$(SourceDir)\SiteMonitor\SiteMonitor.csproj" />
-	<MonitorProjectFile Include="$(SourceDir)\SiteMonitor.Tests\SiteMonitor.Tests.csproj" />
-	<WebProjectFile Include="$(SourceDir)\SiteMonitor.UI\SiteMonitor.UI.csproj" />
+    <MonitorProjectFile Include="$(SourceDir)\SiteMonitor.Tests\SiteMonitor.Tests.csproj" />
   </ItemGroup>
 
   <Import Project="util\msbuild\MSBuild.Community.Tasks.Targets"/>
 
   <Target Name="Clean">
-    <MSBuild Projects="@(MonitorProjectFile)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(MonitorBuildDir)"/>
-    <DeleteTree Directories="$(MonitorBuildDir)" ContinueOnError="true"/>
+    <MSBuild Projects="@(MonitorProjectFile)" Targets="Clean" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(BuildDir)"/>
+    <DeleteTree Directories="$(BuildDir)" ContinueOnError="true"/>
   </Target>
  
   <Target Name="GenerateAssemblyInfo">
@@ -36,29 +32,19 @@
                AssemblyFileVersion="$(ProductVersion)" />
   </Target>
 
-  <Target Name="BuildMonitor" DependsOnTargets="GenerateAssemblyInfo">
-    <MSBuild Projects="@(MonitorProjectFile)" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(MonitorBuildDir)"/>
+  <Target Name="Build" DependsOnTargets="GenerateAssemblyInfo">
+    <MSBuild Projects="@(MonitorProjectFile)" Properties="Configuration=$(Configuration);Platform=$(Platform);OutputPath=$(BuildDir)"/>
   </Target>
-  
-  <Target Name="BuildWeb">
-	  <RemoveDir Directories="$(WebMonitorBuildDir)"
-				 ContinueOnError="true" />
-	  <MSBuild Projects="@(WebProjectFile)"
-			   Targets="ResolveReferences;_CopyWebApplication"
-			   Properties="WebProjectOutputDir=$(WebMonitorBuildDir);
-			   OutDir=$(WebMonitorBuildDir)\" />
-  </Target>
-  
   
   <Target Name="BuildAll">
-    <CallTarget Targets="Clean; BuildMonitor; BuildWeb; Test"></CallTarget>
+    <CallTarget Targets="Clean; Build;  Test"></CallTarget>
   </Target>
 
   <Target Name="Rebuild">
-    <CallTarget Targets="Clean; BuildMonitor"></CallTarget>
+    <CallTarget Targets="Clean; Build"></CallTarget>
   </Target> 
 
-  <Target Name="Test" DependsOnTargets="BuildMonitor">
+  <Target Name="Test" DependsOnTargets="Build">
     <Nunit Assemblies="$(TestAssembly)" ToolPath="util\nunit"/>
   </Target>
 

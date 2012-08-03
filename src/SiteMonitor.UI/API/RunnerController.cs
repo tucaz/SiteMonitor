@@ -10,17 +10,22 @@ namespace SiteMonitor.API
 {
     public class RunnerController : ApiController
     {
+        private Database _db;
+
+        public RunnerController()
+        {
+            _db = new Database(Database.ReadDatabasePathFromConfig());
+        }
+
         public IEnumerable<string> Get()
         {
-            var db = new Database();
-            var runners = db.GetAllRunners();
+            var runners = _db.GetAllRunners();
 
             return runners;
         }
 
-        public dynamic[][] GetResults(string runnerName, string from, string to, string interval)
+        public dynamic GetResults(string runnerName, string from, string to, string interval)
         {
-            var db = new Database();            
             RunResultsForRunner results = null;
 
             DateTime fromDate = DateTime.MinValue;
@@ -28,17 +33,22 @@ namespace SiteMonitor.API
 
             ExtractParameters(from, to, interval, out fromDate, out toDate);
 
-            results = db.GetRunResults(runnerName, fromDate, toDate);
+            results = _db.GetRunResults(runnerName, fromDate, toDate);
 
-            var @return = results.Entries.Select(x => 
-                new dynamic[2] { x.RanAt.ToString("hh:mm:ss"), Math.Round(x.TimeTaken, 2) }).ToArray();
+            var @return = new
+            {
+                Title = results.Title,
+                YAxisLegend = results.YAxisLegend,
+                Entries = results.Entries.Select(x =>
+                    new dynamic[2] { x.RanAt.ToString("hh:mm:ss"), Math.Round(x.TimeTaken, 2) }).ToArray()
+            };
 
             return @return;
         }
 
         private void ExtractParameters(string from, string to, string interval, out DateTime fromDate, out DateTime toDate)
         {
-            if(!String.IsNullOrWhiteSpace(interval))
+            if (!String.IsNullOrWhiteSpace(interval))
             {
                 fromDate = interval.FromInterval();
                 toDate = DateTime.Now;
@@ -47,7 +57,7 @@ namespace SiteMonitor.API
             {
                 fromDate = Convert.ToDateTime(from);
                 toDate = Convert.ToDateTime(to);
-            }                      
+            }
         }
     }
 }

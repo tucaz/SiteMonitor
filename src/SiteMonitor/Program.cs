@@ -38,7 +38,7 @@ namespace SiteMonitor
                     {
                         var interval = arguments.Interval.HasValue ? arguments.Interval.Value : 5;
 
-                        LoadTestRunners(arguments);
+                        LoadTestRunners(arguments);                       
 
                         _monitor.StartMonitoring(interval);
                     }
@@ -91,7 +91,7 @@ namespace SiteMonitor
         }
 
         private static void LoadTestRunners(Arguments arguments)
-        {
+        {            
             "Loading test runnners".LogInformation();
             foreach (var assemblyPath in arguments.Assembly)
             {

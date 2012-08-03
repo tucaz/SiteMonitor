@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMonitor.Tests", "SiteMonitor.Tests\SiteMonitor.Tests.csproj", "{C8F10879-0D9B-46D1-9975-B1FF3B9941D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMonitor.UI", "SiteMonitor.UI\SiteMonitor.UI.csproj", "{62CE0A68-03BC-4F42-9B4D-E909C9EBC7F0}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMonitor.Core", "SiteMonitor.Core\SiteMonitor.Core.csproj", "{D27E1D8A-7B63-4858-AD01-A10A641E7FF7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteMonitor", "SiteMonitor\SiteMonitor.csproj", "{79E74197-44BC-43B4-A01B-B764B8BF4ED0}"
@@ -15,10 +13,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{62CE0A68-03BC-4F42-9B4D-E909C9EBC7F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{62CE0A68-03BC-4F42-9B4D-E909C9EBC7F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{62CE0A68-03BC-4F42-9B4D-E909C9EBC7F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{62CE0A68-03BC-4F42-9B4D-E909C9EBC7F0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{79E74197-44BC-43B4-A01B-B764B8BF4ED0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{79E74197-44BC-43B4-A01B-B764B8BF4ED0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79E74197-44BC-43B4-A01B-B764B8BF4ED0}.Release|Any CPU.ActiveCfg = Release|Any CPU

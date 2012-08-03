@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Firefox;
+using SiteMonitor.Core.Log;
 
 namespace SiteMonitor.Core.Runner
 {
@@ -35,26 +36,36 @@ namespace SiteMonitor.Core.Runner
             }
         }
 
-        public void Run()
+        public bool Run()
         {
+            var error = true;
+            
             Setup();
 
             try
             {                
                 _sw.Reset();
                 _sw.Start();
-                this.Run(_driver);
+                error = this.Run(_driver);
                 _sw.Stop();
 
-                this.TimeTaken = _sw.Elapsed;                
+                this.TimeTaken = _sw.Elapsed;
             }
             finally
             {
                 this.TearDown();
             }
+
+            return error;
         }
 
         protected abstract bool Run(IWebDriver driver);
+
+        protected void Log(string message)
+        {
+            message = String.Concat(this.RunnerName, " -> ", message);
+            message.LogDebug(message);
+        }
 
         protected virtual void Setup()
         {

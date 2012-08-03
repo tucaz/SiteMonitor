@@ -89,6 +89,7 @@
   <ItemGroup>
     <Compile Include="API\RunnerController.cs" />
     <Compile Include="API\StaticFileController.cs" />
+    <Compile Include="Compra.cs" />
     <Compile Include="DB\Database.cs" />
     <Compile Include="Interval.cs" />
     <Compile Include="Log\Logger.cs" />

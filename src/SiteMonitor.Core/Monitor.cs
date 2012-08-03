@@ -64,7 +64,7 @@ namespace SiteMonitor.Core
                 .GetTypes().Where(x => x.BaseType == typeof(BaseRunner))
                 .Select(x => (BaseRunner)Activator.CreateInstance(x)).ToList();
 
-            testRunners.ForEach(AddRunner);
+            testRunners.ForEach(AddRunner);            
 
             "Test runners found:".LogInformation();
             testRunners.ForEach(x => "\t\t{0}".LogInformation(x.RunnerName));
@@ -113,11 +113,12 @@ namespace SiteMonitor.Core
             {
                 "Running {0}".LogInformation(x.RunnerName);
 
+                var error = true;
                 var result = new RunResults(x.RunnerName, x.Title, x.YAxisLegend);
 
                 try
                 {
-                    x.Run();
+                    error = x.Run();
                 }
                 catch
                 {
@@ -125,9 +126,10 @@ namespace SiteMonitor.Core
                 }
 
                 result.TicksTaken = x.TimeTaken.Ticks;
+                result.Error = error ? 1 : 0;
                 results.Add(result);
 
-                "Finished running {0}. Time taken: {1}ms".LogInformation(x.RunnerName, x.TimeTaken.TotalMilliseconds);
+                "Finished running {0}. Time taken: {1}ms. Errored: {2}".LogInformation(x.RunnerName, x.TimeTaken.TotalMilliseconds, error.ToString().ToLower());
             });
 
             return results;
